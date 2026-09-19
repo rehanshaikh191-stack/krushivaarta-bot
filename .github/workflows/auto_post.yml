@@ -1,0 +1,31 @@
+name: Auto Post to Blogger
+
+on:
+  workflow_dispatch: # यामुळे तुम्हाला हवे तेव्हा स्वतः जाऊन मॅन्युअली टेस्ट करता येईल
+  schedule:
+    - cron: '0 6 * * *' # दररोज सकाळी ६:०० वाजता स्वयंचलित पोस्ट होईल
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install google-auth google-auth-oauthlib google-api-python-client
+
+    - name: Run Blogger script
+      env:
+        BLOG_ID: ${{ secrets.BLOG_ID }}
+        CLIENT_ID: ${{ secrets.CLIENT_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+        REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      run: |
+        python post_blog.py
