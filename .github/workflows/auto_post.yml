@@ -1,12 +1,12 @@
-name: Auto Post to Blogger
+name: Krushivaarta Daily Automation
 
 on:
-  workflow_dispatch: # यामुळे तुम्हाला हवे तेव्हा स्वतः जाऊन मॅन्युअली टेस्ट करता येईल
+  workflow_dispatch:
   schedule:
-    - cron: '0 6 * * *' # दररोज सकाळी ६:०० वाजता स्वयंचलित पोस्ट होईल
+    - cron: '0 6 * * *' # दररोज सकाळी ६ वाजता स्वयंचलित रन होईल
 
 jobs:
-  build:
+  run-automation:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -19,13 +19,18 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install google-auth google-auth-oauthlib google-api-python-client
+        pip install requests beautifulsoup4 pandas google-auth google-auth-oauthlib google-api-python-client
 
-    - name: Run Blogger script
+    - name: Run Market Data Sync Script
+      run: |
+        python krushivaarta_sync.py
+
+    - name: Run Blogger Post Script
       env:
         BLOG_ID: ${{ secrets.BLOG_ID }}
         CLIENT_ID: ${{ secrets.CLIENT_ID }}
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
         REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        SHEET_CSV_URL: ${{ secrets.SHEET_CSV_URL }}
       run: |
         python post_blog.py
